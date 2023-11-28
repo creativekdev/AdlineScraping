@@ -10,8 +10,8 @@ csv_file_path = "project12.csv"
 
 # Initialize global variable for the CSV file
 global csv_file
-csv_file_model = open(csv_file_path_model, mode='w', newline='')
-csv_file = open(csv_file_path, mode='w', newline='')
+csv_file_model = open(csv_file_path_model, mode='w', newline='', encoding='utf-8')
+csv_file = open(csv_file_path, mode='w', newline='', encoding='utf-8')
 
 csv_writer_model = csv.writer(csv_file_model)
 csv_writer = csv.writer(csv_file)
@@ -133,8 +133,8 @@ def getOEMYear(paramurl):
             all_span_contents = []
             all_span_contents.extend(span_contents)
             all_span_contents.extend([text,url + href])
-            write_to_csv_model(all_span_contents)
-            # getOEMData(url + href)
+            #write_to_csv_model(all_span_contents)
+            getOEMData(url + href)
         # Extract the href attributes from all <a> tags within the <ul>
 def getOEMParts(paramurl):
     response = requests.get(paramurl)
@@ -196,3 +196,5 @@ if response.status_code == 200:
 
 else:
     print(f"Failed to retrieve the webpage. Status code: {response.status_code}")
+csv_file_model.close()
+csv_file.close()
