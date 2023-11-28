@@ -4,12 +4,22 @@ import pandas as pd
 import csv
 
 # File path for the CSV file
-csv_file_path = "project11.csv"
+csv_file_path_model = "project11.csv"
+
+csv_file_path = "project12.csv"
 
 # Initialize global variable for the CSV file
 global csv_file
+csv_file_model = open(csv_file_path_model, mode='w', newline='')
 csv_file = open(csv_file_path, mode='w', newline='')
+
+csv_writer_model = csv.writer(csv_file_model)
 csv_writer = csv.writer(csv_file)
+def write_to_csv_model(row):
+    global csv_writer_model
+
+    # Write a row to the CSV file
+    csv_writer_model.writerow(row)
 def write_to_csv(row):
     global csv_writer
 
@@ -103,18 +113,28 @@ def getOEMYear(paramurl):
     if response.status_code == 200:
         html_content = response.content
         soup = BeautifulSoup(html_content, 'html.parser')
-        # Find the <ul> with class "partsubselect columnlist columnlist_33"
-        ul_element = soup.find('ul', class_='partsubselect columnlist columnlist_33')
+        span_tags = soup.select('li[itemprop="itemListElement"] span[itemprop="name"]')
 
+        span_contents = []
+        # Extract and print the content of each <span> tag
+        for span_tag in span_tags:
+            span_content = span_tag.get_text(strip=True)
+            span_contents.append(span_content)
+
+
+        # Find the <ul> with class "partsubselect columnlist columnlist_33"
+        a_tags = soup.select('.partsubselect.columnlist.columnlist_33 li a')
+        # Extract hrefs and text from <a> tags
+        hrefs = [a['href'] for a in a_tags]
+        texts = [a.text for a in a_tags]
+        # Print the results
+        for href, text in zip(hrefs, texts):
+            # print(f"Href: {href}, Text: {text}")
+            all_span_contents = []
+            all_span_contents.extend([text,href])
+            write_to_csv_model(all_span_contents)
+            # getOEMData(url + href)
         # Extract the href attributes from all <a> tags within the <ul>
-        if ul_element:
-            a_tags = ul_element.find_all('a')
-            href_attributes = [a.get('href', '') for a in a_tags]
-            for hrefitem in href_attributes:
-                getOEMData(url + hrefitem)
-                # print(f"Href Attributes: {url + hrefitem}")
-        else:
-            print("Ul element not found.")
 def getOEMParts(paramurl):
     response = requests.get(paramurl)
 
