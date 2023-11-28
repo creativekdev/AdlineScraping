@@ -131,7 +131,8 @@ def getOEMYear(paramurl):
         for href, text in zip(hrefs, texts):
             # print(f"Href: {href}, Text: {text}")
             all_span_contents = []
-            all_span_contents.extend([text,href])
+            all_span_contents.extend(span_contents)
+            all_span_contents.extend([text,url + href])
             write_to_csv_model(all_span_contents)
             # getOEMData(url + href)
         # Extract the href attributes from all <a> tags within the <ul>
