@@ -32,7 +32,7 @@ def getDetailOEMData(paramurl):
 
     if response.status_code == 200:
         html_content = response.content
-        soup = BeautifulSoup(html_content, 'html.parser')
+        soup = BeautifulSoup(html_content, 'lxml')
         # Find all <span> tags within <li> tags with itemprop "name"
         span_tags = soup.select('li[itemprop="itemListElement"] span[itemprop="name"]')
 
@@ -94,7 +94,7 @@ def getOEMData(paramurl):
 
     if response.status_code == 200:
         html_content = response.content
-        soup = BeautifulSoup(html_content, 'html.parser')
+        soup = BeautifulSoup(html_content, 'lxml')
         # Find the div with id 'partassemthumblist'
         partassemthumblist_div = soup.find('div', {'id': 'partassemthumblist'})
 
@@ -112,7 +112,7 @@ def getOEMYear(paramurl):
 
     if response.status_code == 200:
         html_content = response.content
-        soup = BeautifulSoup(html_content, 'html.parser')
+        soup = BeautifulSoup(html_content, 'lxml')
         span_tags = soup.select('li[itemprop="itemListElement"] span[itemprop="name"]')
 
         span_contents = []
@@ -133,15 +133,15 @@ def getOEMYear(paramurl):
             all_span_contents = []
             all_span_contents.extend(span_contents)
             all_span_contents.extend([text,url + href])
-            write_to_csv_model(all_span_contents)
-            # getOEMData(url + href)
+            #write_to_csv_model(all_span_contents)
+            getOEMData(url + href)
         # Extract the href attributes from all <a> tags within the <ul>
 def getOEMParts(paramurl):
     response = requests.get(paramurl)
 
     if response.status_code == 200:
         html_content = response.content
-        soup = BeautifulSoup(html_content, 'html.parser')
+        soup = BeautifulSoup(html_content, 'lxml')
         # Find the <ul> with class "partsubselect columnlist"
         ul_element = soup.find('ul', class_='partsubselect columnlist')
 
@@ -153,6 +153,7 @@ def getOEMParts(paramurl):
                 getOEMYear(url + hrefitem)
                 # print(f"Href Attributes: {url + hrefitem}")
         else:
+            print(f"Href Attributes: {url + hrefitem}")
             print("Ul element not found.")
 
 
@@ -161,7 +162,7 @@ response = requests.get(url + "/oemparts")
 
 if response.status_code == 200:
     html_content = response.content
-    soup = BeautifulSoup(html_content, 'html.parser')
+    soup = BeautifulSoup(html_content, 'lxml')
     oem_parts_links = soup.find('a', text='OEM Parts')
     first_oem_parts_link = oem_parts_links if oem_parts_links else None
     if first_oem_parts_link:
@@ -179,7 +180,7 @@ if response.status_code == 200:
         csv_file_path = 'title.csv'
         for item in subnav_data:
             response = requests.get(item['href'])
-            soup = BeautifulSoup(response.content, 'html.parser')
+            soup = BeautifulSoup(response.content, 'lxml')
             # Find all div elements with the specified structure
             target_divs = soup.select('.container_16 .grid_33 .contentwrapper > div[style=""] > p > a')
 
