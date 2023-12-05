@@ -3,15 +3,17 @@ from bs4 import BeautifulSoup
 import pandas as pd
 import csv
 
+is_getdetail = 0
 # File path for the CSV file
-csv_file_path_model = "project11.csv"
+csv_file_path_model = "01battit1.csv"
 
-csv_file_path = "project12.csv"
+csv_file_path = "01battit2.csv"
 
 # Initialize global variable for the CSV file
 global csv_file
 csv_file_model = open(csv_file_path_model, mode='w', newline='', encoding='utf-8')
 csv_file = open(csv_file_path, mode='w', newline='', encoding='utf-8')
+
 
 csv_writer_model = csv.writer(csv_file_model)
 csv_writer = csv.writer(csv_file)
@@ -26,7 +28,8 @@ def write_to_csv(row):
     # Write a row to the CSV file
     csv_writer.writerow(row)
 
-url = 'https://www.babbittsonline.com'
+url = 'https://www.canampartshouse.com'
+
 def getDetailOEMData(paramurl):
     response = requests.get(paramurl)
 
@@ -123,18 +126,20 @@ def getOEMYear(paramurl):
 
 
         # Find the <ul> with class "partsubselect columnlist columnlist_33"
-        a_tags = soup.select('.partsubselect.columnlist.columnlist_33 li a')
+        a_tags = soup.select('#partassemthumblist .passemname a')
         # Extract hrefs and text from <a> tags
         hrefs = [a['href'] for a in a_tags]
         texts = [a.text for a in a_tags]
         # Print the results
         for href, text in zip(hrefs, texts):
             # print(f"Href: {href}, Text: {text}")
-            all_span_contents = []
-            all_span_contents.extend(span_contents)
-            all_span_contents.extend([text,url + href])
-            #write_to_csv_model(all_span_contents)
-            getOEMData(url + href)
+            if is_getdetail:
+                getOEMData(url + href)
+            else:
+                all_span_contents = []
+                all_span_contents.extend(span_contents)
+                all_span_contents.extend([text,url + href])
+                write_to_csv_model(all_span_contents)
         # Extract the href attributes from all <a> tags within the <ul>
 def getOEMParts(paramurl):
     response = requests.get(paramurl)
@@ -143,7 +148,7 @@ def getOEMParts(paramurl):
         html_content = response.content
         soup = BeautifulSoup(html_content, 'lxml')
         # Find the <ul> with class "partsubselect columnlist"
-        ul_element = soup.find('ul', class_='partsubselect columnlist')
+        ul_element = soup.find('ul', class_='partsubselect columnlist columnlist_33')
 
         # Extract the href attributes from all <a> tags within the <ul>
         if ul_element:
@@ -177,12 +182,12 @@ if response.status_code == 200:
         df = pd.DataFrame(subnav_data)
 
         # Specify the file path
-        csv_file_path = 'title.csv'
+        # csv_file_path = 'title.csv'
         for item in subnav_data:
             response = requests.get(item['href'])
             soup = BeautifulSoup(response.content, 'lxml')
             # Find all div elements with the specified structure
-            target_divs = soup.select('.container_16 .grid_33 .contentwrapper > div[style=""] > p > a')
+            target_divs = soup.select('.partsubselect.columnlist > li > a')
 
             # Extract and print the href attributes
             href_attributes = [div.get('href', '') for div in target_divs]
@@ -191,7 +196,7 @@ if response.status_code == 200:
             # print(f"Href Attributes: {href_attributes}")
 
         # Write DataFrame to CSV file
-        df.to_csv(csv_file_path, index=False)
+        # df.to_csv(csv_file_path, index=False)
 
     # print(soup)
 
